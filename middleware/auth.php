@@ -15,7 +15,7 @@ if (session_status() === PHP_SESSION_NONE) {
 function require_login(): void
 {
     if (empty($_SESSION['user'])) {
-        header('Location: ' . BASE_URL . '/login.php');
+        header('Location: ' . BASE_URL . '/auth/login.php');
         exit;
     }
 }
