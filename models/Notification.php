@@ -36,12 +36,34 @@ class Notification
     }
 
     /**
+     * Retrieve unread notifications for a user.
+     */
+    public static function unreadForUser(int $userId): array
+    {
+        $pdo = Database::getConnection();
+        $sql = 'SELECT * FROM notifications WHERE user_id = :id AND is_read = 0 ORDER BY created_at DESC';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id' => $userId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Mark a notification as read.
      */
     public static function markAsRead(int $id): bool
     {
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare('UPDATE notifications SET is_read = 1 WHERE id = :id');
+        return $stmt->execute(['id' => $id]);
+    }
+
+    /**
+     * Delete a notification.
+     */
+    public static function delete(int $id): bool
+    {
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare('DELETE FROM notifications WHERE id = :id');
         return $stmt->execute(['id' => $id]);
     }
 }
