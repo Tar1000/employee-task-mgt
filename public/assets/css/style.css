@@ -1,0 +1,41 @@
+:root {
+    --bs-emerald: #50C878;
+    --bs-orange: #FF8800;
+}
+
+.bg-emerald {
+    background-color: var(--bs-emerald) !important;
+}
+
+.text-emerald {
+    color: var(--bs-emerald) !important;
+}
+
+.bg-orange {
+    background-color: var(--bs-orange) !important;
+}
+
+.text-orange {
+    color: var(--bs-orange) !important;
+}
+
+.btn-emerald {
+    background-color: var(--bs-emerald);
+    color: #fff;
+}
+
+.btn-emerald:hover,
+.btn-emerald:focus {
+    background-color: #3fae62;
+    color: #fff;
+}
+
+.offcanvas a.nav-link {
+    padding: 0.75rem 1rem;
+}
+
+.offcanvas a.nav-link:hover,
+.offcanvas a.nav-link:focus {
+    background-color: var(--bs-orange);
+    color: #fff;
+}
