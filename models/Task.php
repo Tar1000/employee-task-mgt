@@ -169,4 +169,64 @@ class Task
         $stmt = $pdo->prepare('DELETE FROM tasks WHERE id = :id');
         return $stmt->execute(['id' => $id]);
     }
+
+    /**
+     * Count overdue tasks where due_date is in the past and status is not completed.
+     * If the tasks table lacks a due_date column, returns 0 to avoid SQL errors.
+     */
+    public static function countOverdue(?int $assignee = null): int
+    {
+        $pdo = Database::getConnection();
+        $col = $pdo->prepare("SHOW COLUMNS FROM tasks LIKE 'due_date'");
+        $col->execute();
+        if ($col->fetch() === false) {
+            return 0;
+        }
+
+        $sql = "SELECT COUNT(*) FROM tasks WHERE status != 'completed' AND due_date < CURDATE()";
+        $params = [];
+        if ($assignee !== null) {
+            $sql .= " AND assignee_id = :assignee";
+            $params['assignee'] = $assignee;
+        }
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return (int)$stmt->fetchColumn();
+    }
+
+    /**
+     * Return an associative array of status => count.
+     */
+    public static function statusDistribution(): array
+    {
+        $pdo = Database::getConnection();
+        $stmt = $pdo->query("SELECT status, COUNT(*) AS count FROM tasks GROUP BY status");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $data = [];
+        foreach ($rows as $row) {
+            $data[$row['status']] = (int)$row['count'];
+        }
+        return $data;
+    }
+
+    /**
+     * Return an associative array of priority => count.
+     * If the tasks table lacks a priority column, an empty array is returned.
+     */
+    public static function priorityDistribution(): array
+    {
+        $pdo = Database::getConnection();
+        $col = $pdo->prepare("SHOW COLUMNS FROM tasks LIKE 'priority'");
+        $col->execute();
+        if ($col->fetch() === false) {
+            return [];
+        }
+        $stmt = $pdo->query("SELECT priority, COUNT(*) AS count FROM tasks GROUP BY priority");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $data = [];
+        foreach ($rows as $row) {
+            $data[$row['priority']] = (int)$row['count'];
+        }
+        return $data;
+    }
 }
