@@ -27,18 +27,27 @@ class NotificationController
     }
 
     /**
+     * Fetch unread notifications for current user.
+     */
+    public static function unread(): array
+    {
+        require_login();
+        $user = current_user();
+        return Notification::unreadForUser($user['id']);
+    }
+
+    /**
      * Mark a notification as read.
      */
-    public static function mark(int $id): void
+    public static function mark(int $id): bool
     {
         require_login();
         $token = $_POST['csrf_token'] ?? '';
         if (!verify_csrf_token($token)) {
             http_response_code(400);
             flash('error', 'Invalid CSRF token.');
-            return;
+            return false;
         }
-        Notification::markAsRead($id);
-        redirect('views/notifications/index.php');
+        return Notification::markAsRead($id);
     }
 }
